@@ -47,6 +47,7 @@ const login = async (req,res,next) => {
         const checkPass = await compare(password, user.password);
         //if(!checkPass) {return res.status(400).json({message: "Invalid userId or password"});}
         if(!checkPass) return next(new ErrorHandler("Invalid Username or Password",404));
+        console.log("It is reaching till here");
         sendToken(res, user, 200, `Welcome Back, ${user.name}`);  
     }catch(err){
         next(err);

@@ -8,6 +8,13 @@ import {emitEvent} from "../utils/features.js"
 import {NEW_REQUEST , REFETCH_CHATS} from "../constants/events.js"
 import { uploadFilesToCloudinary } from "../utils/cloudinary.js";
 
+const cookieOptions = {
+    maxAge: 30 * 24 * 60 * 60 * 1000,
+    sameSite: "none",
+    httpOnly: true,
+    secure: true,
+}; 
+
 //create new user, save to database, create and save cookie
 const register = async (req,res,next) => { 
     try{
@@ -29,7 +36,15 @@ const register = async (req,res,next) => {
             avatar
         });
 
-        sendToken(res, user, 201, "User created successfully");
+        const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
+        console.log(token);
+        return res.status(201).cookie("wechat_token", token, cookieOptions).json({
+            success: true,
+            user,
+            message: "User created successfully",
+        });
+
+        //sendToken(res, user, 201, "User created successfully");
     }catch(err){
         next(err);
     }
@@ -48,7 +63,16 @@ const login = async (req,res,next) => {
         //if(!checkPass) {return res.status(400).json({message: "Invalid userId or password"});}
         if(!checkPass) return next(new ErrorHandler("Invalid Username or Password",404));
         console.log("It is reaching till here");
-        sendToken(res, user, 200, `Welcome Back, ${user.name}`);  
+        
+        const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
+        console.log(token);
+        console,log(process.env.JWT_SECRET);
+        return res.status(201).cookie("wechat_token", token, cookieOptions).json({
+            success: true,
+            user,
+            message: `Welcome Back, ${user.name}`
+        });
+        //sendToken(res, user, 200, `Welcome Back, ${user.name}`);  
     }catch(err){
         next(err);
     }

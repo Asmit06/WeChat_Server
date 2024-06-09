@@ -139,7 +139,6 @@ const searchUser = async(req,res,next) => {
             avatar: avatar.url,
         }));
 
-        socket.emit("lalalalala", user._id);
         return res.status(200).json({
             success: true,
             onlyReqDetails,
